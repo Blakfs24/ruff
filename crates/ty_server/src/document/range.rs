@@ -10,7 +10,7 @@ use ruff_text_size::{Ranged, TextRange, TextSize};
 
 /// A range in an LSP text document (cell or a regular document).
 #[derive(Clone, Debug, Default)]
-pub(crate) struct LspRange {
+pub struct LspRange {
     range: lsp_types::Range,
 
     /// The URI of this range's text document
@@ -27,21 +27,21 @@ impl LspRange {
     ///
     /// Do NOT use this for standalone ranges - use [`Self::to_location`] instead to ensure
     /// the URI and range are consistent.
-    pub(crate) fn local_range(&self) -> lsp_types::Range {
+    pub fn local_range(&self) -> lsp_types::Range {
         self.range
     }
 
     /// Converts this range into an LSP location.
     ///
     /// Returns `None` if the URI for this file couldn't be resolved.
-    pub(crate) fn to_location(&self) -> Option<lsp_types::Location> {
+    pub fn to_location(&self) -> Option<lsp_types::Location> {
         Some(lsp_types::Location {
             uri: self.uri.clone()?,
             range: self.range,
         })
     }
 
-    pub(crate) fn into_location(self) -> Option<lsp_types::Location> {
+    pub fn into_location(self) -> Option<lsp_types::Location> {
         Some(lsp_types::Location {
             uri: self.uri?,
             range: self.range,
@@ -51,7 +51,7 @@ impl LspRange {
 
 /// A position in an LSP text document (cell or a regular document).
 #[derive(Clone, Debug, Default)]
-pub(crate) struct LspPosition {
+pub struct LspPosition {
     position: lsp_types::Position,
 
     /// The URI of this range's text document
@@ -66,18 +66,18 @@ impl LspPosition {
     ///
     /// Do NOT use this for standalone positions - use [`Self::to_location`] instead to ensure
     /// the URI and position are consistent.
-    pub(crate) fn local_position(&self) -> lsp_types::Position {
+    pub fn local_position(&self) -> lsp_types::Position {
         self.position
     }
 
     /// Returns the uri of the text document this position belongs to.
     #[expect(unused)]
-    pub(crate) fn uri(&self) -> Option<&lsp_types::Url> {
+    pub fn uri(&self) -> Option<&lsp_types::Url> {
         self.uri.as_ref()
     }
 }
 
-pub(crate) trait RangeExt {
+pub trait RangeExt {
     /// Convert an LSP Range to a [`TextRange`].
     ///
     /// Returns `None` if `file` is a notebook and the
@@ -107,7 +107,7 @@ impl RangeExt for lsp_types::Range {
     }
 }
 
-pub(crate) trait PositionExt {
+pub trait PositionExt {
     /// Convert an LSP Position to internal `TextSize`.
     ///
     /// For notebook support, this uses the URI to determine which cell the position
@@ -162,7 +162,7 @@ impl PositionExt for lsp_types::Position {
     }
 }
 
-pub(crate) trait TextSizeExt {
+pub trait TextSizeExt {
     /// Converts `self` into a position in an LSP text document (can be a cell or regular document).
     ///
     /// Returns `None` if the position can't be converted:
@@ -210,7 +210,7 @@ impl TextSizeExt for TextSize {
     }
 }
 
-pub(crate) trait ToRangeExt {
+pub trait ToRangeExt {
     /// Converts self into a range into an LSP text document (can be a cell or regular document).
     ///
     /// Returns `None` if the range can't be converted:
@@ -269,7 +269,7 @@ fn lsp_position_to_text_size(
 /// Helper function to convert an LSP Range to internal `TextRange`.
 /// This is used internally by the `RangeExt` trait and in special cases
 /// where `db` and `file` are not available (e.g., when applying document changes).
-pub(crate) fn lsp_range_to_text_range(
+pub fn lsp_range_to_text_range(
     range: lsp_types::Range,
     text: &str,
     index: &LineIndex,
@@ -333,7 +333,7 @@ fn source_location_to_position(location: &SourceLocation) -> lsp_types::Position
     }
 }
 
-pub(crate) trait FileRangeExt {
+pub trait FileRangeExt {
     /// Converts this file range to an `LspRange`, which then requires an explicit
     /// decision about how to use it (as a local range or as a location).
     fn to_lsp_range(&self, db: &dyn Db, encoding: PositionEncoding) -> Option<LspRange>;

@@ -9,15 +9,15 @@ pub use crate::logging::{LogLevel, init_logging};
 pub use crate::server::{PartialWorkspaceProgress, PartialWorkspaceProgressParams, Server};
 pub use crate::session::{ClientOptions, DiagnosticMode, GlobalOptions, WorkspaceOptions};
 pub use document::{NotebookDocument, PositionEncoding, TextDocument};
-pub(crate) use session::Session;
+pub use session::Session;
 
-mod capabilities;
-mod db;
-mod document;
-mod logging;
-mod server;
-mod session;
-mod system;
+pub mod capabilities;
+pub mod db;
+pub mod document;
+pub mod logging;
+pub mod server;
+pub mod session;
+pub mod system;
 
 pub(crate) const SERVER_NAME: &str = "ty";
 pub(crate) const DIAGNOSTIC_NAME: &str = "ty";

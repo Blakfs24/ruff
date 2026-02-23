@@ -11,7 +11,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct SemanticTokensRangeRequestHandler;
+pub struct SemanticTokensRangeRequestHandler;
 
 impl RequestHandler for SemanticTokensRangeRequestHandler {
     type RequestType = lsp_types::request::SemanticTokensRangeRequest;

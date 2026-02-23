@@ -5,7 +5,7 @@ use crate::PositionEncoding;
 use crate::document::range::lsp_range_to_text_range;
 use crate::system::AnySystemPath;
 
-pub(crate) type DocumentVersion = i32;
+pub type DocumentVersion = i32;
 
 /// A regular text file or the content of a notebook cell.
 ///
@@ -57,7 +57,7 @@ impl TextDocument {
     }
 
     #[must_use]
-    pub(crate) fn with_notebook(mut self, notebook: AnySystemPath) -> Self {
+    pub fn with_notebook(mut self, notebook: AnySystemPath) -> Self {
         self.notebook = Some(notebook);
         self
     }
@@ -66,7 +66,7 @@ impl TextDocument {
         self.contents
     }
 
-    pub(crate) fn url(&self) -> &Url {
+    pub fn url(&self) -> &Url {
         &self.url
     }
 
@@ -82,7 +82,7 @@ impl TextDocument {
         self.language_id
     }
 
-    pub(crate) fn notebook(&self) -> Option<&AnySystemPath> {
+    pub fn notebook(&self) -> Option<&AnySystemPath> {
         self.notebook.as_ref()
     }
 

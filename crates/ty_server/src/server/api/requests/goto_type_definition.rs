@@ -12,7 +12,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct GotoTypeDefinitionRequestHandler;
+pub struct GotoTypeDefinitionRequestHandler;
 
 impl RequestHandler for GotoTypeDefinitionRequestHandler {
     type RequestType = GotoTypeDefinition;

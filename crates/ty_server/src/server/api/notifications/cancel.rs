@@ -7,7 +7,7 @@ use crate::server::api::traits::{NotificationHandler, SyncNotificationHandler};
 use crate::session::Session;
 use crate::session::client::Client;
 
-pub(crate) struct CancelNotificationHandler;
+pub struct CancelNotificationHandler;
 
 impl NotificationHandler for CancelNotificationHandler {
     type NotificationType = Cancel;

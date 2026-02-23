@@ -12,7 +12,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct ReferencesRequestHandler;
+pub struct ReferencesRequestHandler;
 
 impl RequestHandler for ReferencesRequestHandler {
     type RequestType = References;

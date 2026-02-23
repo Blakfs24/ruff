@@ -8,7 +8,7 @@ use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 
 /// Tracks the pending requests between client and server.
-pub(crate) struct RequestQueue {
+pub struct RequestQueue {
     incoming: Incoming,
     outgoing: Outgoing,
 }
@@ -21,21 +21,21 @@ impl RequestQueue {
         }
     }
 
-    pub(crate) fn outgoing_mut(&mut self) -> &mut Outgoing {
+    pub fn outgoing_mut(&mut self) -> &mut Outgoing {
         &mut self.outgoing
     }
 
     /// Returns the server to client request queue.
-    pub(crate) fn outgoing(&self) -> &Outgoing {
+    pub fn outgoing(&self) -> &Outgoing {
         &self.outgoing
     }
 
     /// Returns the client to server request queue.
-    pub(crate) fn incoming(&self) -> &Incoming {
+    pub fn incoming(&self) -> &Incoming {
         &self.incoming
     }
 
-    pub(crate) fn incoming_mut(&mut self) -> &mut Incoming {
+    pub fn incoming_mut(&mut self) -> &mut Incoming {
         &mut self.incoming
     }
 }
@@ -53,13 +53,13 @@ impl RequestQueue {
 /// Tracking whether a request is pending is required to ensure that the server sends exactly
 /// one response for every request as required by the LSP specification.
 #[derive(Default, Debug)]
-pub(crate) struct Incoming {
+pub struct Incoming {
     pending: FxHashMap<RequestId, PendingRequest>,
 }
 
 impl Incoming {
     /// Registers a new pending request.
-    pub(crate) fn register(&mut self, request_id: RequestId, method: String) {
+    pub fn register(&mut self, request_id: RequestId, method: String) {
         self.pending.insert(request_id, PendingRequest::new(method));
     }
 
@@ -76,12 +76,12 @@ impl Incoming {
     }
 
     /// Returns `true` if the request with the given id is still pending.
-    pub(crate) fn is_pending(&self, request_id: &RequestId) -> bool {
+    pub fn is_pending(&self, request_id: &RequestId) -> bool {
         self.pending.contains_key(request_id)
     }
 
     /// Returns the cancellation token for the given request id if the request is still pending.
-    pub(crate) fn cancellation_token(
+    pub fn cancellation_token(
         &self,
         request_id: &RequestId,
     ) -> Option<RequestCancellationToken> {
@@ -97,7 +97,7 @@ impl Incoming {
     /// Marks the request as completed.
     ///
     /// Returns the time when the request was registered and the request method name, or `None` if the request was not pending.
-    pub(crate) fn complete(&mut self, request_id: &RequestId) -> Option<(Instant, String)> {
+    pub fn complete(&mut self, request_id: &RequestId) -> Option<(Instant, String)> {
         self.pending
             .remove(request_id)
             .map(|pending| (pending.start_time, pending.method))
@@ -137,11 +137,11 @@ impl PendingRequest {
 ///
 /// Can be shared between threads to check for cancellation *after* a request has been scheduled.
 #[derive(Debug, Default)]
-pub(crate) struct RequestCancellationToken(Arc<AtomicBool>);
+pub struct RequestCancellationToken(Arc<AtomicBool>);
 
 impl RequestCancellationToken {
     /// Returns true if the request was cancelled.
-    pub(crate) fn is_cancelled(&self) -> bool {
+    pub fn is_cancelled(&self) -> bool {
         self.0.load(std::sync::atomic::Ordering::Relaxed)
     }
 
@@ -157,7 +157,7 @@ impl RequestCancellationToken {
 
 /// Requests from server -> client.
 #[derive(Default)]
-pub(crate) struct Outgoing {
+pub struct Outgoing {
     /// The id of the next request sent from the server to the client.
     next_request_id: Cell<i32>,
 
@@ -168,7 +168,7 @@ pub(crate) struct Outgoing {
 impl Outgoing {
     /// Registers a handler, returns the id for the request.
     #[must_use]
-    pub(crate) fn register(&self, handler: ClientResponseHandler) -> RequestId {
+    pub fn register(&self, handler: ClientResponseHandler) -> RequestId {
         let id = self.next_request_id.get();
         self.next_request_id.set(id + 1);
 
@@ -182,7 +182,7 @@ impl Outgoing {
     ///
     /// Returns `None` if the request was not found.
     #[must_use]
-    pub(crate) fn complete(&mut self, request_id: &RequestId) -> Option<ClientResponseHandler> {
+    pub fn complete(&mut self, request_id: &RequestId) -> Option<ClientResponseHandler> {
         self.response_handlers.get_mut().remove(request_id)
     }
 }

@@ -6,7 +6,7 @@ use crate::server::api::traits::{NotificationHandler, SyncNotificationHandler};
 use crate::session::Session;
 use crate::session::client::Client;
 
-pub(crate) struct DidChangeWorkspaceFoldersHandler;
+pub struct DidChangeWorkspaceFoldersHandler;
 
 impl NotificationHandler for DidChangeWorkspaceFoldersHandler {
     type NotificationType = notif::DidChangeWorkspaceFolders;

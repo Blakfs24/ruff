@@ -8,12 +8,12 @@ use lsp_server::Message;
 use lsp_types::Url;
 use lsp_types::notification::Notification;
 
-pub(crate) type ConnectionSender = crossbeam::channel::Sender<Message>;
-pub(crate) type MainLoopSender = crossbeam::channel::Sender<Event>;
-pub(crate) type MainLoopReceiver = crossbeam::channel::Receiver<Event>;
+pub type ConnectionSender = crossbeam::channel::Sender<Message>;
+pub type MainLoopSender = crossbeam::channel::Sender<Event>;
+pub type MainLoopReceiver = crossbeam::channel::Receiver<Event>;
 
 impl Server {
-    pub(super) fn main_loop(&mut self) -> crate::Result<()> {
+    pub fn main_loop(&mut self) -> crate::Result<()> {
         self.initialize(&Client::new(
             self.main_loop_sender.clone(),
             self.connection.sender.clone(),
@@ -202,7 +202,7 @@ impl Server {
 
 /// An action that should be performed on the main loop.
 #[derive(Debug)]
-pub(crate) enum Action {
+pub enum Action {
     /// Send a response to the client
     SendResponse(lsp_server::Response),
 
@@ -220,17 +220,17 @@ pub(crate) enum Action {
 }
 
 #[derive(Debug)]
-pub(crate) enum Event {
+pub enum Event {
     /// An incoming message from the LSP client.
     Message(lsp_server::Message),
 
     Action(Action),
 }
 
-pub(crate) struct SendRequest {
-    pub(crate) method: String,
-    pub(crate) params: serde_json::Value,
-    pub(crate) response_handler: ClientResponseHandler,
+pub struct SendRequest {
+    pub method: String,
+    pub params: serde_json::Value,
+    pub response_handler: ClientResponseHandler,
 }
 
 impl std::fmt::Debug for SendRequest {

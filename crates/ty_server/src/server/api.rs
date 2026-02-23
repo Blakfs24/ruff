@@ -18,7 +18,7 @@ mod type_hierarchy;
 use self::traits::{NotificationHandler, RequestHandler};
 use super::{Result, schedule::BackgroundSchedule};
 use crate::session::client::Client;
-pub(crate) use diagnostics::publish_settings_diagnostics;
+pub use diagnostics::publish_settings_diagnostics;
 pub use requests::{PartialWorkspaceProgress, PartialWorkspaceProgressParams};
 use ruff_db::panic::PanicError;
 
@@ -28,7 +28,7 @@ use ruff_db::panic::PanicError;
 /// it's crucial that all paths in this method call [`Client::respond`] exactly once.
 /// The only exception to this is requests that were cancelled by the client. In this case,
 /// the response was already sent by the [`notification::CancelNotificationHandler`].
-pub(super) fn request(req: server::Request) -> Task {
+pub fn request(req: server::Request) -> Task {
     let id = req.id.clone();
 
     match req.method.as_str() {
@@ -160,7 +160,7 @@ pub(super) fn request(req: server::Request) -> Task {
     })
 }
 
-pub(super) fn notification(notif: server::Notification) -> Task {
+pub fn notification(notif: server::Notification) -> Task {
     match notif.method.as_str() {
         notifications::DidCloseTextDocumentHandler::METHOD => {
             sync_notification_task::<notifications::DidCloseTextDocumentHandler>(notif)
@@ -526,9 +526,9 @@ where
     ))
 }
 
-pub(crate) struct Error {
-    pub(crate) code: server::ErrorCode,
-    pub(crate) error: anyhow::Error,
+pub struct Error {
+    pub code: server::ErrorCode,
+    pub error: anyhow::Error,
 }
 
 /// A trait to convert result types into the server result type, [`super::Result`].
@@ -543,7 +543,7 @@ impl<T, E: Into<anyhow::Error>> LSPResult<T> for core::result::Result<T, E> {
 }
 
 impl Error {
-    pub(crate) fn new(err: anyhow::Error, code: server::ErrorCode) -> Self {
+    pub fn new(err: anyhow::Error, code: server::ErrorCode) -> Self {
         Self { code, error: err }
     }
 }

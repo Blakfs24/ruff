@@ -15,7 +15,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct InlayHintRequestHandler;
+pub struct InlayHintRequestHandler;
 
 impl RequestHandler for InlayHintRequestHandler {
     type RequestType = InlayHintRequest;

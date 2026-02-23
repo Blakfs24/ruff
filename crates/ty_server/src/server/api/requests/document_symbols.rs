@@ -15,7 +15,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct DocumentSymbolRequestHandler;
+pub struct DocumentSymbolRequestHandler;
 
 impl RequestHandler for DocumentSymbolRequestHandler {
     type RequestType = DocumentSymbolRequest;

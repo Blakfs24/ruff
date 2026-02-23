@@ -96,7 +96,7 @@ use crate::system::file_to_url;
 /// changed the [`Session`]'s state.
 ///
 /// [workspace-diagnostics](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_diagnostic)
-pub(crate) struct WorkspaceDiagnosticRequestHandler;
+pub struct WorkspaceDiagnosticRequestHandler;
 
 impl RequestHandler for WorkspaceDiagnosticRequestHandler {
     type RequestType = WorkspaceDiagnosticRequest;

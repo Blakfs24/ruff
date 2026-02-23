@@ -12,7 +12,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct SemanticTokensRequestHandler;
+pub struct SemanticTokensRequestHandler;
 
 impl RequestHandler for SemanticTokensRequestHandler {
     type RequestType = lsp_types::request::SemanticTokensFullRequest;

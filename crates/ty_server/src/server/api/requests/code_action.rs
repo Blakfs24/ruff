@@ -19,7 +19,7 @@ use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 use crate::{DIAGNOSTIC_NAME, PositionEncoding};
 
-pub(crate) struct CodeActionRequestHandler;
+pub struct CodeActionRequestHandler;
 
 impl RequestHandler for CodeActionRequestHandler {
     type RequestType = req::CodeActionRequest;

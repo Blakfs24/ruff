@@ -22,7 +22,7 @@ use ruff_python_ast::PySourceType;
 use ty_ide::cached_vendored_path;
 
 /// Returns a [`Url`] for the given [`File`].
-pub(crate) fn file_to_url(db: &dyn Db, file: File) -> Option<Url> {
+pub fn file_to_url(db: &dyn Db, file: File) -> Option<Url> {
     match file.path(db) {
         FilePath::System(system) => Url::from_file_path(system.as_std_path()).ok(),
         FilePath::SystemVirtual(path) => Url::parse(path.as_str()).ok(),
@@ -36,13 +36,13 @@ pub(crate) fn file_to_url(db: &dyn Db, file: File) -> Option<Url> {
 
 /// Represents either a [`SystemPath`] or a [`SystemVirtualPath`].
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
-pub(crate) enum AnySystemPath {
+pub enum AnySystemPath {
     System(SystemPathBuf),
     SystemVirtual(SystemVirtualPathBuf),
 }
 
 impl AnySystemPath {
-    pub(crate) const fn as_system(&self) -> Option<&SystemPathBuf> {
+    pub const fn as_system(&self) -> Option<&SystemPathBuf> {
         match self {
             AnySystemPath::System(system_path_buf) => Some(system_path_buf),
             AnySystemPath::SystemVirtual(_) => None,
@@ -50,7 +50,7 @@ impl AnySystemPath {
     }
 
     #[expect(unused)]
-    pub(crate) const fn as_virtual(&self) -> Option<&SystemVirtualPath> {
+    pub const fn as_virtual(&self) -> Option<&SystemVirtualPath> {
         match self {
             AnySystemPath::SystemVirtual(path) => Some(path.as_path()),
             AnySystemPath::System(_) => None,
@@ -68,7 +68,7 @@ impl fmt::Display for AnySystemPath {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct LSPSystem {
+pub struct LSPSystem {
     /// A read-only copy of the index where the server stores all the open documents and settings.
     ///
     /// This will be [`None`] when a mutable reference is held to the index via [`index_mut`]
@@ -86,7 +86,7 @@ pub(crate) struct LSPSystem {
 }
 
 impl LSPSystem {
-    pub(crate) fn new(
+    pub fn new(
         index: Arc<Index>,
         native_system: Arc<dyn System + 'static + Send + Sync + RefUnwindSafe>,
     ) -> Self {
@@ -97,12 +97,12 @@ impl LSPSystem {
     }
 
     /// Takes the index out of the system.
-    pub(crate) fn take_index(&mut self) -> Option<Arc<Index>> {
+    pub fn take_index(&mut self) -> Option<Arc<Index>> {
         self.index.take()
     }
 
     /// Sets the index for the system.
-    pub(crate) fn set_index(&mut self, index: Arc<Index>) {
+    pub fn set_index(&mut self, index: Arc<Index>) {
         self.index = Some(index);
     }
 
@@ -137,12 +137,12 @@ impl LSPSystem {
         }
     }
 
-    pub(crate) fn system_path_to_document(&self, path: &SystemPath) -> Option<&Document> {
+    pub fn system_path_to_document(&self, path: &SystemPath) -> Option<&Document> {
         let any_path = AnySystemPath::System(path.to_path_buf());
         self.document(any_path)
     }
 
-    pub(crate) fn system_virtual_path_to_document(
+    pub fn system_virtual_path_to_document(
         &self,
         path: &SystemVirtualPath,
     ) -> Option<&Document> {

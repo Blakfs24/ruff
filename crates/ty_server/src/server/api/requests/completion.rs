@@ -18,7 +18,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct CompletionRequestHandler;
+pub struct CompletionRequestHandler;
 
 impl RequestHandler for CompletionRequestHandler {
     type RequestType = Completion;

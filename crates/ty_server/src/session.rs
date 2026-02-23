@@ -29,9 +29,9 @@ use ty_project::{ChangeResult, Db as _, ProjectDatabase, ProjectMetadata};
 use index::DocumentError;
 use ty_python_semantic::UseDefaultStrategy;
 
-pub(crate) use self::options::InitializationOptions;
+pub use self::options::InitializationOptions;
 pub use self::options::{ClientOptions, DiagnosticMode, GlobalOptions, WorkspaceOptions};
-pub(crate) use self::settings::{GlobalSettings, WorkspaceSettings};
+pub use self::settings::{GlobalSettings, WorkspaceSettings};
 use crate::capabilities::{ResolvedClientCapabilities, server_diagnostic_options};
 use crate::document::{DocumentKey, DocumentVersion, LanguageId, NotebookDocument};
 use crate::server::{Action, publish_settings_diagnostics};
@@ -42,14 +42,14 @@ use crate::system::{AnySystemPath, LSPSystem};
 use crate::{PositionEncoding, TextDocument};
 use index::Index;
 
-pub(crate) mod client;
-pub(crate) mod index;
-mod options;
-mod request_queue;
-mod settings;
+pub mod client;
+pub mod index;
+pub mod options;
+pub mod request_queue;
+pub mod settings;
 
 /// The global state for the LSP
-pub(crate) struct Session {
+pub struct Session {
     /// A native system to use with the [`LSPSystem`].
     native_system: Arc<dyn System + 'static + Send + Sync + RefUnwindSafe>,
 
@@ -111,7 +111,7 @@ pub(crate) struct Session {
 }
 
 /// LSP State for a Project
-pub(crate) struct ProjectState {
+pub struct ProjectState {
     /// Files that we have outstanding otherwise-untracked pushed diagnostics for.
     ///
     /// In `CheckMode::OpenFiles` we still read some files that the client hasn't
@@ -137,7 +137,7 @@ pub(crate) struct ProjectState {
 }
 
 impl Session {
-    pub(crate) fn new(
+    pub fn new(
         resolved_client_capabilities: ResolvedClientCapabilities,
         position_encoding: PositionEncoding,
         workspace_urls: Vec<Url>,
@@ -175,27 +175,27 @@ impl Session {
         })
     }
 
-    pub(crate) fn request_queue(&self) -> &RequestQueue {
+    pub fn request_queue(&self) -> &RequestQueue {
         &self.request_queue
     }
 
-    pub(crate) fn request_queue_mut(&mut self) -> &mut RequestQueue {
+    pub fn request_queue_mut(&mut self) -> &mut RequestQueue {
         &mut self.request_queue
     }
 
-    pub(crate) fn initialization_options(&self) -> &InitializationOptions {
+    pub fn initialization_options(&self) -> &InitializationOptions {
         &self.initialization_options
     }
 
-    pub(crate) fn is_shutdown_requested(&self) -> bool {
+    pub fn is_shutdown_requested(&self) -> bool {
         self.shutdown_requested
     }
 
-    pub(crate) fn set_shutdown_requested(&mut self, requested: bool) {
+    pub fn set_shutdown_requested(&mut self, requested: bool) {
         self.shutdown_requested = requested;
     }
 
-    pub(crate) fn set_suspended_workspace_diagnostics_request(
+    pub fn set_suspended_workspace_diagnostics_request(
         &mut self,
         request: SuspendedWorkspaceDiagnosticRequest,
         client: &Client,
@@ -207,7 +207,7 @@ impl Session {
         self.resume_suspended_workspace_diagnostic_request(client);
     }
 
-    pub(crate) fn take_suspended_workspace_diagnostic_request(
+    pub fn take_suspended_workspace_diagnostic_request(
         &mut self,
     ) -> Option<SuspendedWorkspaceDiagnosticRequest> {
         self.suspended_workspace_diagnostics_request.take()
@@ -219,7 +219,7 @@ impl Session {
     ///
     /// The workspace diagnostic requests is ignored if the request
     /// was cancelled in the meantime.
-    pub(crate) fn resume_suspended_workspace_diagnostic_request(&mut self, client: &Client) {
+    pub fn resume_suspended_workspace_diagnostic_request(&mut self, client: &Client) {
         self.suspended_workspace_diagnostics_request = self
             .suspended_workspace_diagnostics_request
             .take()
@@ -259,7 +259,7 @@ impl Session {
     /// database in place.
     ///
     /// See <https://github.com/Microsoft/language-server-protocol/issues/567#issuecomment-2085131917>
-    pub(crate) fn should_defer_message(&mut self, message: Message) -> Option<Message> {
+    pub fn should_defer_message(&mut self, message: Message) -> Option<Message> {
         if self.workspaces.all_initialized() {
             Some(message)
         } else {
@@ -293,7 +293,7 @@ impl Session {
         }
     }
 
-    pub(crate) fn workspaces(&self) -> &Workspaces {
+    pub fn workspaces(&self) -> &Workspaces {
         &self.workspaces
     }
 
@@ -303,13 +303,13 @@ impl Session {
     /// given path, or the first project if no project is found for the path.
     ///
     /// If the path is a virtual path, it will return the first project database in the session.
-    pub(crate) fn project_db(&self, path: &AnySystemPath) -> &ProjectDatabase {
+    pub fn project_db(&self, path: &AnySystemPath) -> &ProjectDatabase {
         &self.project_state(path).db
     }
 
     /// Returns an iterator, in arbitrary order, over all project databases
     /// in this session.
-    pub(crate) fn project_dbs(&self) -> impl Iterator<Item = &ProjectDatabase> {
+    pub fn project_dbs(&self) -> impl Iterator<Item = &ProjectDatabase> {
         self.projects
             .values()
             .map(|project_state| &project_state.db)
@@ -321,13 +321,13 @@ impl Session {
     /// Refer to [`project_db`] for more details on how the project is selected.
     ///
     /// [`project_db`]: Session::project_db
-    pub(crate) fn project_db_mut(&mut self, path: &AnySystemPath) -> &mut ProjectDatabase {
+    pub fn project_db_mut(&mut self, path: &AnySystemPath) -> &mut ProjectDatabase {
         &mut self.project_state_mut(path).db
     }
 
     /// Returns a reference to the project's [`ProjectDatabase`] corresponding to the given path, if
     /// any.
-    pub(crate) fn project_db_for_path(
+    pub fn project_db_for_path(
         &self,
         path: impl AsRef<SystemPath>,
     ) -> Option<&ProjectDatabase> {
@@ -340,7 +340,7 @@ impl Session {
     /// given path, or the first project if no project is found for the path.
     ///
     /// If the path is a virtual path, it will return the first project database in the session.
-    pub(crate) fn project_state(&self, path: &AnySystemPath) -> &ProjectState {
+    pub fn project_state(&self, path: &AnySystemPath) -> &ProjectState {
         match path {
             AnySystemPath::System(system_path) => self
                 .project_state_for_path(system_path)
@@ -355,7 +355,7 @@ impl Session {
     /// Refer to [`project_db`] for more details on how the project is selected.
     ///
     /// [`project_db`]: Session::project_db
-    pub(crate) fn project_state_mut(&mut self, path: &AnySystemPath) -> &mut ProjectState {
+    pub fn project_state_mut(&mut self, path: &AnySystemPath) -> &mut ProjectState {
         match path {
             AnySystemPath::System(system_path) => {
                 let range = ..=system_path.to_path_buf();
@@ -378,7 +378,7 @@ impl Session {
 
     /// Returns a reference to the project's [`ProjectState`] corresponding to the given path, if
     /// any.
-    pub(crate) fn project_state_for_path(
+    pub fn project_state_for_path(
         &self,
         path: impl AsRef<SystemPath>,
     ) -> Option<&ProjectState> {
@@ -403,7 +403,7 @@ impl Session {
         self.projects.values_mut().next().unwrap()
     }
 
-    pub(crate) fn apply_changes(
+    pub fn apply_changes(
         &mut self,
         path: &AnySystemPath,
         changes: Vec<ChangeEvent>,
@@ -423,12 +423,12 @@ impl Session {
     }
 
     /// Returns a mutable iterator over all project databases.
-    pub(crate) fn projects_mut(&mut self) -> impl Iterator<Item = &'_ mut ProjectDatabase> + '_ {
+    pub fn projects_mut(&mut self) -> impl Iterator<Item = &'_ mut ProjectDatabase> + '_ {
         self.project_states_mut().map(|project| &mut project.db)
     }
 
     /// Returns a mutable iterator over all projects.
-    pub(crate) fn project_states_mut(&mut self) -> impl Iterator<Item = &'_ mut ProjectState> + '_ {
+    pub fn project_states_mut(&mut self) -> impl Iterator<Item = &'_ mut ProjectState> + '_ {
         self.projects.values_mut()
     }
 
@@ -449,7 +449,7 @@ impl Session {
     ///
     /// This is typically called when a response to a
     /// `workspace/configuration` request is received.
-    pub(crate) fn initialize_workspace_folders(
+    pub fn initialize_workspace_folders(
         &mut self,
         client: &Client,
         workspace_folders: Vec<(Url, ClientOptions)>,
@@ -535,7 +535,7 @@ impl Session {
     ///
     /// The client provided is used to show error messages and publish
     /// diagnostics related to configuration.
-    pub(crate) fn initialize_workspace_folder(
+    pub fn initialize_workspace_folder(
         &mut self,
         client: &Client,
         url: &Url,
@@ -671,7 +671,7 @@ impl Session {
     /// To initialize the workspace folder, callers must initiate
     /// a request for workspace folder configuration via
     /// `Session::request_uninitialized_workspace_folder_configuration`.
-    pub(crate) fn register_workspace_folder(&mut self, url: Url) -> anyhow::Result<bool> {
+    pub fn register_workspace_folder(&mut self, url: Url) -> anyhow::Result<bool> {
         self.workspaces.register(url)
     }
 
@@ -689,7 +689,7 @@ impl Session {
     ///
     /// Adding an uninitialized workspace to this session can be done
     /// with `Session::register_workspace_folder`.
-    pub(crate) fn request_uninitialized_workspace_folder_configurations(
+    pub fn request_uninitialized_workspace_folder_configurations(
         &mut self,
         client: &Client,
     ) {
@@ -790,7 +790,7 @@ impl Session {
     ///
     /// This returns an error if the workspace folder has already been removed
     /// or otherwise could not be found.
-    pub(crate) fn remove_workspace_folder(
+    pub fn remove_workspace_folder(
         &mut self,
         client: &Client,
         url: &Url,
@@ -858,7 +858,7 @@ impl Session {
     /// This is done by notifying the client with an empty list of diagnostics for the document.
     /// For notebook cells, this clears diagnostics for the specific cell.
     /// For other document types, this clears diagnostics for the main document.
-    pub(crate) fn clear_diagnostics(&self, client: &Client, uri: &Url) {
+    pub fn clear_diagnostics(&self, client: &Client, uri: &Url) {
         if self.global_settings().diagnostic_mode().is_off() {
             return;
         }
@@ -871,7 +871,7 @@ impl Session {
         );
     }
 
-    pub(crate) fn take_deferred_messages(&mut self) -> Option<Message> {
+    pub fn take_deferred_messages(&mut self) -> Option<Message> {
         if self.workspaces.all_initialized() {
             self.deferred_messages.pop_front()
         } else {
@@ -1088,7 +1088,7 @@ impl Session {
     }
 
     /// Creates a document snapshot with the URL referencing the document to snapshot.
-    pub(crate) fn snapshot_document(&self, url: &Url) -> Result<DocumentSnapshot, DocumentError> {
+    pub fn snapshot_document(&self, url: &Url) -> Result<DocumentSnapshot, DocumentError> {
         let index = self.index();
         let document_handle = index.document_handle(url)?;
 
@@ -1121,7 +1121,7 @@ impl Session {
     }
 
     /// Creates a snapshot of the current state of the [`Session`].
-    pub(crate) fn snapshot_session(&self) -> SessionSnapshot {
+    pub fn snapshot_session(&self) -> SessionSnapshot {
         SessionSnapshot {
             projects: self
                 .projects
@@ -1151,7 +1151,7 @@ impl Session {
     /// # Errors
     ///
     /// If the document is not found.
-    pub(crate) fn document_handle(
+    pub fn document_handle(
         &self,
         url: &lsp_types::Url,
     ) -> Result<DocumentHandle, DocumentError> {
@@ -1162,7 +1162,7 @@ impl Session {
     /// If a document is already open here, it will be overwritten.
     ///
     /// Returns a handle to the opened document.
-    pub(crate) fn open_notebook_document(&mut self, document: NotebookDocument) -> DocumentHandle {
+    pub fn open_notebook_document(&mut self, document: NotebookDocument) -> DocumentHandle {
         let handle = self.index_mut().open_notebook_document(document);
         self.open_document_in_db(&handle, None);
         handle
@@ -1172,7 +1172,7 @@ impl Session {
     /// If a document is already open here, it will be overwritten.
     ///
     /// Returns a handle to the opened document.
-    pub(crate) fn open_text_document(&mut self, document: TextDocument) -> DocumentHandle {
+    pub fn open_text_document(&mut self, document: TextDocument) -> DocumentHandle {
         let language_id = document.language_id();
         let handle = self.index_mut().open_text_document(document);
         self.open_document_in_db(&handle, Some(language_id));
@@ -1278,19 +1278,19 @@ impl Session {
         }
     }
 
-    pub(crate) fn client_capabilities(&self) -> ResolvedClientCapabilities {
+    pub fn client_capabilities(&self) -> ResolvedClientCapabilities {
         self.resolved_client_capabilities
     }
 
-    pub(crate) fn global_settings(&self) -> &GlobalSettings {
+    pub fn global_settings(&self) -> &GlobalSettings {
         &self.global_settings
     }
 
-    pub(crate) fn position_encoding(&self) -> PositionEncoding {
+    pub fn position_encoding(&self) -> PositionEncoding {
         self.position_encoding
     }
 
-    pub(crate) fn client_name(&self) -> ClientName {
+    pub fn client_name(&self) -> ClientName {
         self.client_name
     }
 }
@@ -1336,7 +1336,7 @@ impl Drop for MutIndexGuard<'_> {
 
 /// An immutable snapshot of [`Session`] that references a specific document.
 #[derive(Debug)]
-pub(crate) struct DocumentSnapshot {
+pub struct DocumentSnapshot {
     resolved_client_capabilities: ResolvedClientCapabilities,
     global_settings: Arc<GlobalSettings>,
     workspace_settings: Arc<WorkspaceSettings>,
@@ -1347,35 +1347,35 @@ pub(crate) struct DocumentSnapshot {
 
 impl DocumentSnapshot {
     /// Returns the resolved client capabilities that were captured during initialization.
-    pub(crate) fn resolved_client_capabilities(&self) -> ResolvedClientCapabilities {
+    pub fn resolved_client_capabilities(&self) -> ResolvedClientCapabilities {
         self.resolved_client_capabilities
     }
 
     /// Returns the position encoding that was negotiated during initialization.
-    pub(crate) fn encoding(&self) -> PositionEncoding {
+    pub fn encoding(&self) -> PositionEncoding {
         self.position_encoding
     }
 
     /// Returns the client settings for all workspaces.
-    pub(crate) fn global_settings(&self) -> &GlobalSettings {
+    pub fn global_settings(&self) -> &GlobalSettings {
         &self.global_settings
     }
 
     /// Returns the client settings for the workspace that this document belongs to.
-    pub(crate) fn workspace_settings(&self) -> &WorkspaceSettings {
+    pub fn workspace_settings(&self) -> &WorkspaceSettings {
         &self.workspace_settings
     }
 
     /// Returns the result of the document query for this snapshot.
-    pub(crate) fn document(&self) -> &DocumentHandle {
+    pub fn document(&self) -> &DocumentHandle {
         &self.document
     }
 
-    pub(crate) fn url(&self) -> &lsp_types::Url {
+    pub fn url(&self) -> &lsp_types::Url {
         self.document.url()
     }
 
-    pub(crate) fn to_notebook_or_file(&self, db: &dyn Db) -> Option<File> {
+    pub fn to_notebook_or_file(&self, db: &dyn Db) -> Option<File> {
         let file = self.document.notebook_or_file(db);
         if file.is_none() {
             tracing::debug!(
@@ -1386,17 +1386,17 @@ impl DocumentSnapshot {
         file
     }
 
-    pub(crate) fn notebook_or_file_path(&self) -> &AnySystemPath {
+    pub fn notebook_or_file_path(&self) -> &AnySystemPath {
         self.document.notebook_or_file_path()
     }
 
-    pub(crate) fn client_name(&self) -> ClientName {
+    pub fn client_name(&self) -> ClientName {
         self.client_name
     }
 }
 
 /// An immutable snapshot of the current state of [`Session`].
-pub(crate) struct SessionSnapshot {
+pub struct SessionSnapshot {
     index: Arc<Index>,
     global_settings: Arc<GlobalSettings>,
     position_encoding: PositionEncoding,
@@ -1418,23 +1418,23 @@ pub(crate) struct SessionSnapshot {
 }
 
 impl SessionSnapshot {
-    pub(crate) fn projects(&self) -> &[ProjectDatabase] {
+    pub fn projects(&self) -> &[ProjectDatabase] {
         &self.projects
     }
 
-    pub(crate) fn index(&self) -> &Index {
+    pub fn index(&self) -> &Index {
         &self.index
     }
 
-    pub(crate) fn global_settings(&self) -> &GlobalSettings {
+    pub fn global_settings(&self) -> &GlobalSettings {
         &self.global_settings
     }
 
-    pub(crate) fn position_encoding(&self) -> PositionEncoding {
+    pub fn position_encoding(&self) -> PositionEncoding {
         self.position_encoding
     }
 
-    pub(crate) fn resolved_client_capabilities(&self) -> ResolvedClientCapabilities {
+    pub fn resolved_client_capabilities(&self) -> ResolvedClientCapabilities {
         self.resolved_client_capabilities
     }
 
@@ -1442,11 +1442,11 @@ impl SessionSnapshot {
         self.in_test
     }
 
-    pub(crate) fn revision(&self) -> u64 {
+    pub fn revision(&self) -> u64 {
         self.revision
     }
 
-    pub(crate) fn client_name(&self) -> ClientName {
+    pub fn client_name(&self) -> ClientName {
         self.client_name
     }
 }
@@ -1472,7 +1472,7 @@ impl ClientName {
     ///
     /// Different editors have different ways to access language server logs, so we provide tailored
     /// instructions based on the connected client.
-    pub(crate) fn log_guidance(self) -> &'static str {
+    pub fn log_guidance(self) -> &'static str {
         match self {
             ClientName::Zed => {
                 "Please refer to the logs for more details \
@@ -1588,23 +1588,23 @@ pub(crate) struct Workspace {
 }
 
 impl Workspace {
-    pub(crate) fn url(&self) -> &Url {
+    pub fn url(&self) -> &Url {
         &self.url
     }
 
-    pub(crate) fn settings(&self) -> &WorkspaceSettings {
+    pub fn settings(&self) -> &WorkspaceSettings {
         &self.settings
     }
 
-    pub(crate) fn settings_arc(&self) -> Arc<WorkspaceSettings> {
+    pub fn settings_arc(&self) -> Arc<WorkspaceSettings> {
         self.settings.clone()
     }
 
-    pub(crate) fn is_initialized(&self) -> bool {
+    pub fn is_initialized(&self) -> bool {
         self.initialized
     }
 
-    pub(crate) fn initialize(&mut self, settings: WorkspaceSettings) {
+    pub fn initialize(&mut self, settings: WorkspaceSettings) {
         self.settings = Arc::new(settings);
         self.initialized = true;
     }
@@ -1719,7 +1719,7 @@ impl DocumentHandle {
     }
 
     /// The URL as used by the client to reference this document.
-    pub(crate) fn url(&self) -> &lsp_types::Url {
+    pub fn url(&self) -> &lsp_types::Url {
         match self {
             Self::Text { url, .. } | Self::Notebook { url, .. } | Self::Cell { url, .. } => url,
         }
@@ -1729,7 +1729,7 @@ impl DocumentHandle {
     ///
     /// This is the path corresponding to the URL, except for notebook cells where the
     /// path corresponds to the notebook file.
-    pub(crate) fn notebook_or_file_path(&self) -> &AnySystemPath {
+    pub fn notebook_or_file_path(&self) -> &AnySystemPath {
         match self {
             Self::Text { path, .. } | Self::Notebook { path, .. } => path,
             Self::Cell { notebook_path, .. } => notebook_path,
@@ -1737,7 +1737,7 @@ impl DocumentHandle {
     }
 
     #[expect(unused)]
-    pub(crate) fn file_path(&self) -> Option<&AnySystemPath> {
+    pub fn file_path(&self) -> Option<&AnySystemPath> {
         match self {
             Self::Text { path, .. } | Self::Notebook { path, .. } => Some(path),
             Self::Cell { .. } => None,
@@ -1745,7 +1745,7 @@ impl DocumentHandle {
     }
 
     #[expect(unused)]
-    pub(crate) fn notebook_path(&self) -> Option<&AnySystemPath> {
+    pub fn notebook_path(&self) -> Option<&AnySystemPath> {
         match self {
             DocumentHandle::Notebook { path, .. } => Some(path),
             DocumentHandle::Cell { notebook_path, .. } => Some(notebook_path),
@@ -1758,7 +1758,7 @@ impl DocumentHandle {
     /// It returns [`None`] for the following cases:
     /// - For virtual file, if it's not yet opened
     /// - For regular file, if it does not exists or is a directory
-    pub(crate) fn notebook_or_file(&self, db: &dyn Db) -> Option<File> {
+    pub fn notebook_or_file(&self, db: &dyn Db) -> Option<File> {
         match &self.notebook_or_file_path() {
             AnySystemPath::System(path) => system_path_to_file(db, path).ok(),
             AnySystemPath::SystemVirtual(virtual_path) => db
@@ -1768,15 +1768,15 @@ impl DocumentHandle {
         }
     }
 
-    pub(crate) fn is_cell(&self) -> bool {
+    pub fn is_cell(&self) -> bool {
         matches!(self, Self::Cell { .. })
     }
 
-    pub(crate) fn is_cell_or_notebook(&self) -> bool {
+    pub fn is_cell_or_notebook(&self) -> bool {
         matches!(self, Self::Cell { .. } | Self::Notebook { .. })
     }
 
-    pub(crate) fn update_text_document(
+    pub fn update_text_document(
         &mut self,
         session: &mut Session,
         content_changes: Vec<TextDocumentContentChangeEvent>,
@@ -1806,7 +1806,7 @@ impl DocumentHandle {
         Ok(())
     }
 
-    pub(crate) fn update_notebook_document(
+    pub fn update_notebook_document(
         &mut self,
         session: &mut Session,
         cells: Option<lsp_types::NotebookDocumentCellChange>,
@@ -1865,7 +1865,7 @@ impl DocumentHandle {
     ///
     /// This can return an error when the document does not exist in the
     /// session index.
-    pub(crate) fn close(&self, session: &mut Session) -> crate::Result<bool> {
+    pub fn close(&self, session: &mut Session) -> crate::Result<bool> {
         let is_cell = self.is_cell();
         let path = self.notebook_or_file_path();
 

@@ -34,18 +34,18 @@ use crate::session::client::Client;
 /// endpoint. Most editors support this endpoint, so this is not a significant limitation.
 #[derive(Clone, Debug, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct InitializationOptions {
+pub struct InitializationOptions {
     /// The log level for the language server.
-    pub(crate) log_level: Option<LogLevel>,
+    pub log_level: Option<LogLevel>,
 
     /// Path to the log file, defaults to stderr if not set.
     ///
     /// Tildes (`~`) and environment variables (e.g., `$HOME`) are expanded.
-    pub(crate) log_file: Option<SystemPathBuf>,
+    pub log_file: Option<SystemPathBuf>,
 
     /// The remaining options that are dynamic and can change during the runtime of the server.
     #[serde(flatten)]
-    pub(crate) options: ClientOptions,
+    pub options: ClientOptions,
 }
 
 impl InitializationOptions {
@@ -55,7 +55,7 @@ impl InitializationOptions {
     /// It returns a tuple of the initialization options and an optional error if the JSON value
     /// could not be deserialized into the initialization options. In case of an error, the default
     /// initialization options are returned.
-    pub(crate) fn from_value(
+    pub fn from_value(
         options: Option<Value>,
     ) -> (InitializationOptions, Option<serde_json::Error>) {
         let Some(options) = options else {
@@ -159,7 +159,7 @@ pub struct GlobalOptions {
 }
 
 impl GlobalOptions {
-    pub(crate) fn into_settings(self) -> GlobalSettings {
+    pub fn into_settings(self) -> GlobalSettings {
         let experimental = self
             .experimental
             .map(Experimental::into_settings)
@@ -201,7 +201,7 @@ pub struct WorkspaceOptions {
 }
 
 impl WorkspaceOptions {
-    pub(crate) fn into_settings(
+    pub fn into_settings(
         self,
         root: &SystemPath,
         client: &Client,
@@ -374,19 +374,19 @@ pub enum DiagnosticMode {
 
 impl DiagnosticMode {
     /// Returns `true` if the diagnostic mode is set to check all files in the workspace.
-    pub(crate) const fn is_workspace(self) -> bool {
+    pub const fn is_workspace(self) -> bool {
         matches!(self, DiagnosticMode::Workspace)
     }
 
     /// Returns `true` if the diagnostic mode is set to check only currently open files.
-    pub(crate) const fn is_open_files_only(self) -> bool {
+    pub const fn is_open_files_only(self) -> bool {
         matches!(self, DiagnosticMode::OpenFilesOnly)
     }
 
     /// Returns this diagnostic mode as a check mode.
     ///
     /// This returns `None` when diagnostics are disabled.
-    pub(crate) const fn to_check_mode(self) -> Option<CheckMode> {
+    pub const fn to_check_mode(self) -> Option<CheckMode> {
         match self {
             DiagnosticMode::Off => None,
             DiagnosticMode::OpenFilesOnly => Some(CheckMode::OpenFiles),
@@ -394,7 +394,7 @@ impl DiagnosticMode {
         }
     }
 
-    pub(crate) const fn is_off(self) -> bool {
+    pub const fn is_off(self) -> bool {
         matches!(self, DiagnosticMode::Off)
     }
 }
@@ -447,38 +447,38 @@ impl Combine for PythonExtension {
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct ActiveEnvironment {
-    pub(crate) executable: PythonExecutable,
-    pub(crate) environment: Option<PythonEnvironment>,
-    pub(crate) version: Option<EnvironmentVersion>,
+pub struct ActiveEnvironment {
+    pub executable: PythonExecutable,
+    pub environment: Option<PythonEnvironment>,
+    pub version: Option<EnvironmentVersion>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct EnvironmentVersion {
-    pub(crate) major: i64,
-    pub(crate) minor: i64,
+pub struct EnvironmentVersion {
+    pub major: i64,
+    pub minor: i64,
     #[allow(dead_code)]
-    pub(crate) patch: i64,
+    pub patch: i64,
     #[allow(dead_code)]
-    pub(crate) sys_version: String,
+    pub sys_version: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct PythonEnvironment {
-    pub(crate) folder_uri: Url,
+pub struct PythonEnvironment {
+    pub folder_uri: Url,
     #[allow(dead_code)]
     #[serde(rename = "type")]
-    pub(crate) kind: String,
+    pub kind: String,
     #[allow(dead_code)]
-    pub(crate) name: Option<String>,
+    pub name: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct PythonExecutable {
+pub struct PythonExecutable {
     #[allow(dead_code)]
-    pub(crate) uri: Url,
-    pub(crate) sys_prefix: SystemPathBuf,
+    pub uri: Url,
+    pub sys_prefix: SystemPathBuf,
 }

@@ -12,7 +12,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct DocumentHighlightRequestHandler;
+pub struct DocumentHighlightRequestHandler;
 
 impl RequestHandler for DocumentHighlightRequestHandler {
     type RequestType = DocumentHighlightRequest;

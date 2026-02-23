@@ -15,7 +15,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct FoldingRangeRequestHandler;
+pub struct FoldingRangeRequestHandler;
 
 impl RequestHandler for FoldingRangeRequestHandler {
     type RequestType = FoldingRangeRequest;

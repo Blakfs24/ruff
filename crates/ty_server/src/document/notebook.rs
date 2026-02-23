@@ -62,13 +62,13 @@ impl NotebookDocument {
         })
     }
 
-    pub(crate) fn url(&self) -> &lsp_types::Url {
+    pub fn url(&self) -> &lsp_types::Url {
         &self.url
     }
 
     /// Generates a pseudo-representation of a notebook that lacks per-cell metadata and contextual information
     /// but should still work with Ruff's linter.
-    pub(crate) fn to_ruff_notebook(&self, index: &Index) -> ruff_notebook::Notebook {
+    pub fn to_ruff_notebook(&self, index: &Index) -> ruff_notebook::Notebook {
         let cells = self
             .cells
             .iter()
@@ -121,7 +121,7 @@ impl NotebookDocument {
             .unwrap_or_else(|err| panic!("Server notebook document could not be converted to ty's notebook document format: {err}"))
     }
 
-    pub(crate) fn update(
+    pub fn update(
         &mut self,
         array: lsp_types::NotebookCellArrayChange,
         updated_cells: Vec<lsp_types::NotebookCell>,
@@ -166,23 +166,23 @@ impl NotebookDocument {
     }
 
     /// Get the current version of the notebook document.
-    pub(crate) fn version(&self) -> DocumentVersion {
+    pub fn version(&self) -> DocumentVersion {
         self.version
     }
 
     /// Get the URI for a cell by its index within the cell array.
-    pub(crate) fn cell_uri_by_index(&self, index: OneIndexed) -> Option<&lsp_types::Url> {
+    pub fn cell_uri_by_index(&self, index: OneIndexed) -> Option<&lsp_types::Url> {
         self.cells
             .get(index.to_zero_indexed())
             .map(|cell| &cell.url)
     }
 
     /// Returns a list of cell URIs in the order they appear in the array.
-    pub(crate) fn cell_urls(&self) -> impl Iterator<Item = &lsp_types::Url> {
+    pub fn cell_urls(&self) -> impl Iterator<Item = &lsp_types::Url> {
         self.cells.iter().map(|cell| &cell.url)
     }
 
-    pub(crate) fn cell_index_by_uri(&self, cell_url: &lsp_types::Url) -> Option<OneIndexed> {
+    pub fn cell_index_by_uri(&self, cell_url: &lsp_types::Url) -> Option<OneIndexed> {
         Some(OneIndexed::from_zero_indexed(
             self.cell_index.get(cell_url).copied()?,
         ))
@@ -190,7 +190,7 @@ impl NotebookDocument {
 }
 
 impl NotebookCell {
-    pub(crate) fn new(cell: lsp_types::NotebookCell) -> Self {
+    pub fn new(cell: lsp_types::NotebookCell) -> Self {
         Self {
             url: cell.document,
             kind: cell.kind,

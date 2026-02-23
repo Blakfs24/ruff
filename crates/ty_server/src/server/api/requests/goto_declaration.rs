@@ -12,7 +12,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct GotoDeclarationRequestHandler;
+pub struct GotoDeclarationRequestHandler;
 
 impl RequestHandler for GotoDeclarationRequestHandler {
     type RequestType = GotoDeclaration;

@@ -7,7 +7,7 @@ use std::any::TypeId;
 use std::fmt::Display;
 
 #[derive(Debug, Clone)]
-pub(crate) struct Client {
+pub struct Client {
     /// Channel to send messages back to the main loop.
     main_loop_sender: MainLoopSender,
     /// Channel to send messages directly to the LSP client without going through the main loop.
@@ -18,7 +18,7 @@ pub(crate) struct Client {
 }
 
 impl Client {
-    pub(crate) fn new(main_loop_sender: MainLoopSender, client_sender: ConnectionSender) -> Self {
+    pub fn new(main_loop_sender: MainLoopSender, client_sender: ConnectionSender) -> Self {
         Self {
             main_loop_sender,
             client_sender,
@@ -34,7 +34,7 @@ impl Client {
     /// Use [`self.send_deferred_request`] if you are in a background task
     /// where you don't have access to the session. But note, that the
     /// request won't be send immediately, but rather queued up in the main loop
-    pub(crate) fn send_request<R>(
+    pub fn send_request<R>(
         &self,
         session: &Session,
         params: R::Params,
@@ -59,7 +59,7 @@ impl Client {
     /// is processed on the main-loop. The handler always runs on the main-loop thread.
     ///
     /// Use [`self.send_request`] if you are in a foreground task and have access to the session.
-    pub(crate) fn send_deferred_request<R>(
+    pub fn send_deferred_request<R>(
         &self,
         params: R::Params,
         response_handler: impl FnOnce(&Client, R::Result) + Send + 'static,
@@ -75,7 +75,7 @@ impl Client {
             .unwrap();
     }
 
-    pub(crate) fn send_request_raw(&self, session: &Session, request: SendRequest) {
+    pub fn send_request_raw(&self, session: &Session, request: SendRequest) {
         let id = session
             .request_queue()
             .outgoing()
@@ -97,7 +97,7 @@ impl Client {
     }
 
     /// Sends a notification to the client.
-    pub(crate) fn send_notification<N>(&self, params: N::Params)
+    pub fn send_notification<N>(&self, params: N::Params)
     where
         N: lsp_types::notification::Notification,
     {
@@ -119,7 +119,7 @@ impl Client {
     ///
     /// This is useful for notifications that don't require any data.
     #[expect(dead_code)]
-    pub(crate) fn send_notification_no_params(&self, method: &str) {
+    pub fn send_notification_no_params(&self, method: &str) {
         if let Err(err) =
             self.client_sender
                 .send(lsp_server::Message::Notification(Notification::new(
@@ -137,7 +137,7 @@ impl Client {
     ///
     /// The response isn't sent immediately. Instead, it's queued up in the main loop
     /// and checked for cancellation (each request must have exactly one response).
-    pub(crate) fn respond<R>(&self, id: &RequestId, result: crate::server::Result<R>)
+    pub fn respond<R>(&self, id: &RequestId, result: crate::server::Result<R>)
     where
         R: serde::Serialize,
     {
@@ -156,7 +156,7 @@ impl Client {
     /// Sends an error response to the client for a given request ID.
     ///
     /// The response isn't sent immediately. Instead, it's queued up in the main loop.
-    pub(crate) fn respond_err(&self, id: RequestId, error: lsp_server::ResponseError) {
+    pub fn respond_err(&self, id: RequestId, error: lsp_server::ResponseError) {
         let response = lsp_server::Response {
             id,
             result: None,
@@ -171,7 +171,7 @@ impl Client {
     /// Shows a message to the user.
     ///
     /// This opens a pop up in VS Code showing `message`.
-    pub(crate) fn show_message(&self, message: impl Display, message_type: lsp_types::MessageType) {
+    pub fn show_message(&self, message: impl Display, message_type: lsp_types::MessageType) {
         self.send_notification::<lsp_types::notification::ShowMessage>(
             lsp_types::ShowMessageParams {
                 typ: message_type,
@@ -184,7 +184,7 @@ impl Client {
     /// sent in a `window/showMessage` notification.
     ///
     /// Logs an error if the message could not be sent.
-    pub(crate) fn show_warning_message(&self, message: impl Display) {
+    pub fn show_warning_message(&self, message: impl Display) {
         self.show_message(message, lsp_types::MessageType::WARNING);
     }
 
@@ -192,24 +192,24 @@ impl Client {
     /// sent in a `window/showMessage` notification.
     ///
     /// Logs an error if the message could not be sent.
-    pub(crate) fn show_error_message(&self, message: impl Display) {
+    pub fn show_error_message(&self, message: impl Display) {
         self.show_message(message, lsp_types::MessageType::ERROR);
     }
 
     /// Re-queues this request after a salsa cancellation for a retry.
     ///
     /// The main loop will skip the retry if the client cancelled the request in the  meantime.
-    pub(crate) fn retry(&self, request: lsp_server::Request) {
+    pub fn retry(&self, request: lsp_server::Request) {
         self.main_loop_sender
             .send(Event::Action(Action::RetryRequest(request)))
             .unwrap();
     }
 
-    pub(crate) fn queue_action(&self, action: Action) {
+    pub fn queue_action(&self, action: Action) {
         self.main_loop_sender.send(Event::Action(action)).unwrap();
     }
 
-    pub(crate) fn cancel(&self, session: &mut Session, id: RequestId) {
+    pub fn cancel(&self, session: &mut Session, id: RequestId) {
         let method_name = session.request_queue_mut().incoming_mut().cancel(&id);
 
         if let Some(method_name) = method_name {
@@ -240,7 +240,7 @@ impl Client {
 
 /// Type erased handler for client responses.
 #[allow(clippy::type_complexity)]
-pub(crate) struct ClientResponseHandler(Box<dyn FnOnce(&Client, lsp_server::Response) + Send>);
+pub struct ClientResponseHandler(Box<dyn FnOnce(&Client, lsp_server::Response) + Send>);
 
 impl ClientResponseHandler {
     fn for_request<R>(response_handler: impl FnOnce(&Client, R::Result) + Send + 'static) -> Self
@@ -291,7 +291,7 @@ impl ClientResponseHandler {
         ))
     }
 
-    pub(crate) fn handle_response(self, client: &Client, response: lsp_server::Response) {
+    pub fn handle_response(self, client: &Client, response: lsp_server::Response) {
         let handler = self.0;
         handler(client, response);
     }

@@ -14,7 +14,7 @@ use lsp_types::{
 use ty_ide::signature_help;
 use ty_project::ProjectDatabase;
 
-pub(crate) struct SignatureHelpRequestHandler;
+pub struct SignatureHelpRequestHandler;
 
 impl RequestHandler for SignatureHelpRequestHandler {
     type RequestType = SignatureHelpRequest;

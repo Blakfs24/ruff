@@ -10,7 +10,7 @@ use crate::{
 
 /// Stores and tracks all open documents in a session, along with their associated settings.
 #[derive(Debug)]
-pub(crate) struct Index {
+pub struct Index {
     /// Maps all document file paths to the associated document controller
     documents: FxHashMap<DocumentKey, Document>,
 }
@@ -31,7 +31,7 @@ impl Index {
         })
     }
 
-    pub(crate) fn document_handle(
+    pub fn document_handle(
         &self,
         url: &lsp_types::Url,
     ) -> Result<DocumentHandle, DocumentError> {
@@ -163,7 +163,7 @@ impl Index {
     /// Create a document reference corresponding to the given document key.
     ///
     /// Returns an error if the document is not found or if the path cannot be converted to a URL.
-    pub(crate) fn document(&self, key: &DocumentKey) -> Result<&Document, DocumentError> {
+    pub fn document(&self, key: &DocumentKey) -> Result<&Document, DocumentError> {
         let Some(document) = self.documents.get(key) else {
             return Err(DocumentError::NotFound(key.clone()));
         };
@@ -212,7 +212,7 @@ impl Index {
 
 /// A mutable handler to an underlying document.
 #[derive(Debug)]
-pub(crate) enum Document {
+pub enum Document {
     Text(Arc<TextDocument>),
     Notebook(Arc<NotebookDocument>),
 }
@@ -226,42 +226,42 @@ impl Document {
         Self::Notebook(Arc::new(document))
     }
 
-    pub(crate) fn version(&self) -> DocumentVersion {
+    pub fn version(&self) -> DocumentVersion {
         match self {
             Self::Text(document) => document.version(),
             Self::Notebook(notebook) => notebook.version(),
         }
     }
 
-    pub(crate) fn language_id(&self) -> Option<LanguageId> {
+    pub fn language_id(&self) -> Option<LanguageId> {
         match self {
             Self::Text(document) => Some(document.language_id()),
             Self::Notebook(_) => None,
         }
     }
 
-    pub(crate) fn as_notebook_mut(&mut self) -> Option<&mut NotebookDocument> {
+    pub fn as_notebook_mut(&mut self) -> Option<&mut NotebookDocument> {
         Some(match self {
             Self::Notebook(notebook) => Arc::make_mut(notebook),
             Self::Text(_) => return None,
         })
     }
 
-    pub(crate) fn as_notebook(&self) -> Option<&NotebookDocument> {
+    pub fn as_notebook(&self) -> Option<&NotebookDocument> {
         match self {
             Self::Notebook(notebook) => Some(notebook),
             Self::Text(_) => None,
         }
     }
 
-    pub(crate) fn as_text(&self) -> Option<&TextDocument> {
+    pub fn as_text(&self) -> Option<&TextDocument> {
         match self {
             Self::Text(document) => Some(document),
             Self::Notebook(_) => None,
         }
     }
 
-    pub(crate) fn as_text_mut(&mut self) -> Option<&mut TextDocument> {
+    pub fn as_text_mut(&mut self) -> Option<&mut TextDocument> {
         Some(match self {
             Self::Text(document) => Arc::make_mut(document),
             Self::Notebook(_) => return None,
@@ -270,7 +270,7 @@ impl Document {
 }
 
 #[derive(Debug, Clone, thiserror::Error)]
-pub(crate) enum DocumentError {
+pub enum DocumentError {
     #[error("document not found for key: {0}")]
     NotFound(DocumentKey),
 }

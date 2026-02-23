@@ -5,7 +5,7 @@ use crate::session::client::Client;
 use lsp_types::{WorkspaceDiagnosticReport, WorkspaceDiagnosticReportResult};
 use salsa::Database;
 
-pub(crate) struct ShutdownHandler;
+pub struct ShutdownHandler;
 
 impl RequestHandler for ShutdownHandler {
     type RequestType = lsp_types::request::Shutdown;

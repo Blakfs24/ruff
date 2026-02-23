@@ -8,7 +8,7 @@ use crate::server::api::traits::{NotificationHandler, SyncNotificationHandler};
 use crate::session::Session;
 use crate::session::client::Client;
 
-pub(crate) struct DidOpenTextDocumentHandler;
+pub struct DidOpenTextDocumentHandler;
 
 impl NotificationHandler for DidOpenTextDocumentHandler {
     type NotificationType = DidOpenTextDocument;

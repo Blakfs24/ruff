@@ -11,7 +11,7 @@ use lsp_types::{HoverContents, HoverParams, MarkupContent, Url};
 use ty_ide::{MarkupKind, hover};
 use ty_project::ProjectDatabase;
 
-pub(crate) struct HoverRequestHandler;
+pub struct HoverRequestHandler;
 
 impl RequestHandler for HoverRequestHandler {
     type RequestType = HoverRequest;

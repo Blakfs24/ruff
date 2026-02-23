@@ -12,7 +12,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct SelectionRangeRequestHandler;
+pub struct SelectionRangeRequestHandler;
 
 impl RequestHandler for SelectionRangeRequestHandler {
     type RequestType = SelectionRangeRequest;

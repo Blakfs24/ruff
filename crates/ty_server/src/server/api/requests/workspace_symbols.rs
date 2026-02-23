@@ -9,7 +9,7 @@ use crate::server::api::traits::{
 use crate::session::SessionSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct WorkspaceSymbolRequestHandler;
+pub struct WorkspaceSymbolRequestHandler;
 
 impl RequestHandler for WorkspaceSymbolRequestHandler {
     type RequestType = WorkspaceSymbolRequest;

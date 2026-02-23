@@ -12,18 +12,18 @@ use std::num::NonZeroUsize;
 use std::panic::{PanicHookInfo, RefUnwindSafe};
 use std::sync::Arc;
 
-mod api;
-mod lazy_work_done_progress;
-mod main_loop;
-mod schedule;
+pub mod api;
+pub mod lazy_work_done_progress;
+pub mod main_loop;
+pub mod schedule;
 
 use crate::session::client::Client;
-pub(crate) use api::Error;
-pub(crate) use api::publish_settings_diagnostics;
-pub(crate) use main_loop::{
+pub use api::Error;
+pub use api::publish_settings_diagnostics;
+pub use main_loop::{
     Action, ConnectionSender, Event, MainLoopReceiver, MainLoopSender, SendRequest,
 };
-pub(crate) type Result<T> = std::result::Result<T, api::Error>;
+pub type Result<T> = std::result::Result<T, api::Error>;
 pub use api::{PartialWorkspaceProgress, PartialWorkspaceProgressParams};
 
 pub struct Server {

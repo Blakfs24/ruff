@@ -12,7 +12,7 @@ type BackgroundFnBuilder = Box<dyn FnOnce(&Session) -> BackgroundFn>;
 
 /// Describes how the task should be run.
 #[derive(Clone, Copy, Debug, Default)]
-pub(in crate::server) enum BackgroundSchedule {
+pub enum BackgroundSchedule {
     /// The task should be run on the background thread designated
     /// for formatting actions. This is a high priority thread.
     #[expect(dead_code)]
@@ -35,7 +35,7 @@ pub(in crate::server) enum BackgroundSchedule {
 /// local tasks will **block** the main event loop, so only use local tasks if you **need**
 /// mutable state access or you need the absolute lowest latency possible.
 #[must_use]
-pub(in crate::server) enum Task {
+pub enum Task {
     Background(BackgroundTaskBuilder),
     Sync(SyncTask),
 }
@@ -48,18 +48,18 @@ pub(in crate::server) enum Task {
 // that the inner closure can capture. This builder closure has a lifetime linked to the scheduler.
 // When the task is dispatched, the scheduler runs the synchronous builder, which takes the session
 // as a reference, to create the inner 'static closure. That closure is then moved to a background task pool.
-pub(in crate::server) struct BackgroundTaskBuilder {
-    pub(super) schedule: BackgroundSchedule,
-    pub(super) builder: BackgroundFnBuilder,
+pub struct BackgroundTaskBuilder {
+    pub schedule: BackgroundSchedule,
+    pub builder: BackgroundFnBuilder,
 }
 
-pub(in crate::server) struct SyncTask {
-    pub(super) func: LocalFn,
+pub struct SyncTask {
+    pub func: LocalFn,
 }
 
 impl Task {
     /// Creates a new background task.
-    pub(crate) fn background<F>(schedule: BackgroundSchedule, func: F) -> Self
+    pub fn background<F>(schedule: BackgroundSchedule, func: F) -> Self
     where
         F: FnOnce(&Session) -> Box<dyn FnOnce(&Client) + Send + 'static> + 'static,
     {
@@ -69,7 +69,7 @@ impl Task {
         })
     }
     /// Creates a new local task.
-    pub(crate) fn sync<F>(func: F) -> Self
+    pub fn sync<F>(func: F) -> Self
     where
         F: FnOnce(&mut Session, &Client) + 'static,
     {
@@ -79,7 +79,7 @@ impl Task {
     }
     /// Creates a local task that immediately
     /// responds with the provided `request`.
-    pub(crate) fn immediate<R>(id: RequestId, result: crate::server::Result<R>) -> Self
+    pub fn immediate<R>(id: RequestId, result: crate::server::Result<R>) -> Self
     where
         R: Serialize + Send + 'static,
     {
@@ -89,7 +89,7 @@ impl Task {
     }
 
     /// Creates a local task that does nothing.
-    pub(crate) fn nothing() -> Self {
+    pub fn nothing() -> Self {
         Self::sync(move |_, _| {})
     }
 }

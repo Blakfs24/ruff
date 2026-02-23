@@ -9,7 +9,7 @@ use crate::server::api::traits::{NotificationHandler, SyncNotificationHandler};
 use crate::session::Session;
 use crate::session::client::Client;
 
-pub(crate) struct DidCloseTextDocumentHandler;
+pub struct DidCloseTextDocumentHandler;
 
 impl NotificationHandler for DidCloseTextDocumentHandler {
     type NotificationType = DidCloseTextDocument;

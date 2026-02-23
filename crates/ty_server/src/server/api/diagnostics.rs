@@ -217,7 +217,7 @@ pub(super) fn publish_diagnostics(document: &DocumentHandle, session: &Session, 
 /// using the [publish diagnostics notification].
 ///
 /// [publish diagnostics notification]: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_publishDiagnostics
-pub(crate) fn publish_settings_diagnostics(
+pub fn publish_settings_diagnostics(
     session: &mut Session,
     client: &Client,
     path: SystemPathBuf,
@@ -485,9 +485,9 @@ fn sub_diagnostic_to_related_information(
 }
 
 #[derive(Serialize, Deserialize)]
-pub(crate) struct DiagnosticData {
-    pub(crate) fix_title: String,
-    pub(crate) edits: HashMap<Url, Vec<lsp_types::TextEdit>>,
+pub struct DiagnosticData {
+    pub fix_title: String,
+    pub edits: HashMap<Url, Vec<lsp_types::TextEdit>>,
 }
 
 impl DiagnosticData {

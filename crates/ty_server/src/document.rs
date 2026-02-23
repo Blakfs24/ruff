@@ -1,19 +1,19 @@
 //! Types and utilities for working with text, modifying source files, and `ty <-> LSP` type conversion.
 
-mod location;
-mod notebook;
-mod range;
-mod text_document;
+pub mod location;
+pub mod notebook;
+pub mod range;
+pub mod text_document;
 
 use lsp_types::{PositionEncodingKind, Url};
 use ruff_db::system::{SystemPathBuf, SystemVirtualPath, SystemVirtualPathBuf};
 
 use crate::system::AnySystemPath;
-pub(crate) use location::ToLink;
+pub use location::ToLink;
 pub use notebook::NotebookDocument;
-pub(crate) use range::{FileRangeExt, PositionExt, RangeExt, TextSizeExt, ToRangeExt};
+pub use range::{FileRangeExt, PositionExt, RangeExt, TextSizeExt, ToRangeExt};
 pub use text_document::TextDocument;
-pub(crate) use text_document::{DocumentVersion, LanguageId};
+pub use text_document::{DocumentVersion, LanguageId};
 
 /// A convenient enumeration for supported text encodings. Can be converted to [`lsp_types::PositionEncodingKind`].
 // Please maintain the order from least to greatest priority for the derived `Ord` impl.
@@ -69,7 +69,7 @@ impl DocumentKey {
     /// the url isn't a valid file path.
     ///
     /// In all other cases, the URL is kept as an opaque identifier ([`Self::Opaque`]).
-    pub(crate) fn from_url(url: &Url) -> Self {
+    pub fn from_url(url: &Url) -> Self {
         if url.scheme() == "file" {
             if let Ok(path) = url.to_file_path() {
                 Self::File(SystemPathBuf::from_path_buf(path).expect("URL to be valid UTF-8"))

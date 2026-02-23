@@ -6,7 +6,7 @@ use crate::Db;
 use crate::PositionEncoding;
 use crate::document::{FileRangeExt, ToRangeExt};
 
-pub(crate) trait ToLink {
+pub trait ToLink {
     fn to_location(&self, db: &dyn Db, encoding: PositionEncoding) -> Option<Location>;
 
     fn to_link(

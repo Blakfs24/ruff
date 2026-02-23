@@ -17,7 +17,7 @@ bitflags::bitflags! {
     ///
     /// This tracks various capabilities that the client supports.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-    pub(crate) struct ResolvedClientCapabilities: u32 {
+    pub struct ResolvedClientCapabilities: u32 {
         const WORKSPACE_DIAGNOSTIC_REFRESH = 1 << 0;
         const INLAY_HINT_REFRESH = 1 << 1;
         const PULL_DIAGNOSTICS = 1 << 2;
@@ -51,7 +51,7 @@ impl std::fmt::Display for ResolvedClientCapabilities {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub(crate) enum SupportedCommand {
+pub enum SupportedCommand {
     Debug,
 }
 
@@ -82,72 +82,72 @@ impl FromStr for SupportedCommand {
 
 impl ResolvedClientCapabilities {
     /// Returns `true` if the client supports workspace diagnostic refresh.
-    pub(crate) const fn supports_workspace_diagnostic_refresh(self) -> bool {
+    pub const fn supports_workspace_diagnostic_refresh(self) -> bool {
         self.contains(Self::WORKSPACE_DIAGNOSTIC_REFRESH)
     }
 
     /// Returns `true` if the client supports workspace configuration.
-    pub(crate) const fn supports_workspace_configuration(self) -> bool {
+    pub const fn supports_workspace_configuration(self) -> bool {
         self.contains(Self::WORKSPACE_CONFIGURATION)
     }
 
     /// Returns `true` if the client supports inlay hint refresh.
-    pub(crate) const fn supports_inlay_hint_refresh(self) -> bool {
+    pub const fn supports_inlay_hint_refresh(self) -> bool {
         self.contains(Self::INLAY_HINT_REFRESH)
     }
 
     /// Returns `true` if the client supports pull diagnostics.
-    pub(crate) const fn supports_pull_diagnostics(self) -> bool {
+    pub const fn supports_pull_diagnostics(self) -> bool {
         self.contains(Self::PULL_DIAGNOSTICS)
     }
 
     /// Returns `true` if the client supports definition links in goto type definition.
-    pub(crate) const fn supports_type_definition_link(self) -> bool {
+    pub const fn supports_type_definition_link(self) -> bool {
         self.contains(Self::TYPE_DEFINITION_LINK_SUPPORT)
     }
 
     /// Returns `true` if the client supports definition links in goto definition.
-    pub(crate) const fn supports_definition_link(self) -> bool {
+    pub const fn supports_definition_link(self) -> bool {
         self.contains(Self::DEFINITION_LINK_SUPPORT)
     }
 
     /// Returns `true` if the client supports definition links in goto declaration.
-    pub(crate) const fn supports_declaration_link(self) -> bool {
+    pub const fn supports_declaration_link(self) -> bool {
         self.contains(Self::DECLARATION_LINK_SUPPORT)
     }
 
     /// Returns `true` if the client prefers markdown in hover responses.
-    pub(crate) const fn prefers_markdown_in_hover(self) -> bool {
+    pub const fn prefers_markdown_in_hover(self) -> bool {
         self.contains(Self::PREFER_MARKDOWN_IN_HOVER)
     }
 
     /// Returns `true` if the client supports multiline semantic tokens.
-    pub(crate) const fn supports_multiline_semantic_tokens(self) -> bool {
+    pub const fn supports_multiline_semantic_tokens(self) -> bool {
         self.contains(Self::MULTILINE_SEMANTIC_TOKENS)
     }
 
     /// Returns `true` if the client supports signature label offsets in signature help.
-    pub(crate) const fn supports_signature_label_offset(self) -> bool {
+    pub const fn supports_signature_label_offset(self) -> bool {
         self.contains(Self::SIGNATURE_LABEL_OFFSET_SUPPORT)
     }
 
     /// Returns `true` if the client supports per-signature active parameter in signature help.
-    pub(crate) const fn supports_signature_active_parameter(self) -> bool {
+    pub const fn supports_signature_active_parameter(self) -> bool {
         self.contains(Self::SIGNATURE_ACTIVE_PARAMETER_SUPPORT)
     }
 
     /// Returns `true` if the client supports hierarchical document symbols.
-    pub(crate) const fn supports_hierarchical_document_symbols(self) -> bool {
+    pub const fn supports_hierarchical_document_symbols(self) -> bool {
         self.contains(Self::HIERARCHICAL_DOCUMENT_SYMBOL_SUPPORT)
     }
 
     /// Returns `true` if the client supports work done progress.
-    pub(crate) const fn supports_work_done_progress(self) -> bool {
+    pub const fn supports_work_done_progress(self) -> bool {
         self.contains(Self::WORK_DONE_PROGRESS)
     }
 
     /// Returns `true` if the client supports file watcher capabilities.
-    pub(crate) const fn supports_file_watcher(self) -> bool {
+    pub const fn supports_file_watcher(self) -> bool {
         self.contains(Self::FILE_WATCHER_SUPPORT)
     }
 
@@ -155,27 +155,27 @@ impl ResolvedClientCapabilities {
     ///
     /// This permits specifying a "base uri" that a glob is interpreted
     /// relative to.
-    pub(crate) const fn supports_relative_file_watcher(self) -> bool {
+    pub const fn supports_relative_file_watcher(self) -> bool {
         self.contains(Self::RELATIVE_FILE_WATCHER_SUPPORT)
     }
 
     /// Returns `true` if the client supports dynamic registration for diagnostic capabilities.
-    pub(crate) const fn supports_diagnostic_dynamic_registration(self) -> bool {
+    pub const fn supports_diagnostic_dynamic_registration(self) -> bool {
         self.contains(Self::DIAGNOSTIC_DYNAMIC_REGISTRATION)
     }
 
     /// Returns `true` if the client has related information support for diagnostics.
-    pub(crate) const fn supports_diagnostic_related_information(self) -> bool {
+    pub const fn supports_diagnostic_related_information(self) -> bool {
         self.contains(Self::DIAGNOSTIC_RELATED_INFORMATION)
     }
 
     /// Returns `true` if the client supports "label details" in completion items.
-    pub(crate) const fn supports_completion_item_label_details(self) -> bool {
+    pub const fn supports_completion_item_label_details(self) -> bool {
         self.contains(Self::COMPLETION_ITEM_LABEL_DETAILS_SUPPORT)
     }
 
     /// Returns `true` if the client prefers Markdown over plain text in completion items.
-    pub(crate) const fn prefers_markdown_in_completion(self) -> bool {
+    pub const fn prefers_markdown_in_completion(self) -> bool {
         self.contains(Self::PREFER_MARKDOWN_IN_COMPLETION)
     }
 
@@ -368,7 +368,7 @@ impl ResolvedClientCapabilities {
 
 /// Creates the server capabilities based on the resolved client capabilities and resolved global
 /// settings from the initialization options.
-pub(crate) fn server_capabilities(
+pub fn server_capabilities(
     position_encoding: PositionEncoding,
     resolved_client_capabilities: ResolvedClientCapabilities,
 ) -> ServerCapabilities {
@@ -475,7 +475,7 @@ pub(crate) fn server_capabilities(
 }
 
 /// Creates the default [`DiagnosticOptions`] for the server.
-pub(crate) fn server_diagnostic_options(workspace_diagnostics: bool) -> DiagnosticOptions {
+pub fn server_diagnostic_options(workspace_diagnostics: bool) -> DiagnosticOptions {
     DiagnosticOptions {
         identifier: Some(crate::DIAGNOSTIC_NAME.to_string()),
         inter_file_dependencies: true,
@@ -488,7 +488,7 @@ pub(crate) fn server_diagnostic_options(workspace_diagnostics: bool) -> Diagnost
     }
 }
 
-pub(crate) fn server_rename_options() -> RenameOptions {
+pub fn server_rename_options() -> RenameOptions {
     RenameOptions {
         prepare_provider: Some(true),
         work_done_progress_options: WorkDoneProgressOptions::default(),

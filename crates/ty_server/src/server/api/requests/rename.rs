@@ -13,7 +13,7 @@ use crate::server::api::traits::{
 use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 
-pub(crate) struct RenameRequestHandler;
+pub struct RenameRequestHandler;
 
 impl RequestHandler for RenameRequestHandler {
     type RequestType = Rename;

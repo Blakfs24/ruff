@@ -16,7 +16,7 @@ use crate::session::DocumentSnapshot;
 use crate::session::client::Client;
 use ty_project::ProjectDatabase;
 
-pub(crate) struct DocumentDiagnosticRequestHandler;
+pub struct DocumentDiagnosticRequestHandler;
 
 impl RequestHandler for DocumentDiagnosticRequestHandler {
     type RequestType = DocumentDiagnosticRequest;

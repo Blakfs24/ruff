@@ -7,7 +7,7 @@ use crate::server::api::traits::{NotificationHandler, SyncNotificationHandler};
 use crate::session::Session;
 use crate::session::client::Client;
 
-pub(crate) struct DidCloseNotebookHandler;
+pub struct DidCloseNotebookHandler;
 
 impl NotificationHandler for DidCloseNotebookHandler {
     type NotificationType = DidCloseNotebookDocument;

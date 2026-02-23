@@ -11,7 +11,7 @@ use std::fmt::Write;
 use std::str::FromStr;
 use ty_project::Db as _;
 
-pub(crate) struct ExecuteCommand;
+pub struct ExecuteCommand;
 
 impl RequestHandler for ExecuteCommand {
     type RequestType = req::ExecuteCommand;

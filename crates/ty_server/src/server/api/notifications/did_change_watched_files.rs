@@ -13,7 +13,7 @@ use rustc_hash::FxHashMap;
 use ty_project::Db as _;
 use ty_project::watch::{ChangeEvent, ChangedKind, CreatedKind, DeletedKind};
 
-pub(crate) struct DidChangeWatchedFiles;
+pub struct DidChangeWatchedFiles;
 
 impl NotificationHandler for DidChangeWatchedFiles {
     type NotificationType = notif::DidChangeWatchedFiles;
