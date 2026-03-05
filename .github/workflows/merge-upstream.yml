@@ -1,0 +1,104 @@
+name: Merge Upstream
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_branch:
+        description: 'Upstream branch to rebase from'
+        required: false
+        default: 'main'
+
+permissions:
+  contents: write
+
+jobs:
+  merge-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check if merge-upstream branch exists
+        id: check_branch
+        run: |
+          if git ls-remote --heads origin merge-upstream | grep -q merge-upstream; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Branch 'merge-upstream' already exists on remote."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ Branch 'merge-upstream' does not exist on remote."
+          fi
+
+      - name: Create or reset merge-upstream branch
+        run: |
+          if [ "${{ steps.check_branch.outputs.exists }}" = "true" ]; then
+            echo "🔄 Resetting merge-upstream to apk-integration..."
+            git checkout merge-upstream
+            git reset --hard origin/apk-integration
+          else
+            echo "🆕 Creating merge-upstream from apk-integration..."
+            git checkout -b merge-upstream origin/apk-integration
+          fi
+
+      - name: Add upstream remote and fetch
+        run: |
+          git remote add upstream https://github.com/astral-sh/ruff.git
+          echo "⬇️ Fetching upstream/${{ inputs.upstream_branch }}..."
+          git fetch upstream ${{ inputs.upstream_branch }}
+
+      - name: Rebase onto upstream
+        id: rebase
+        run: |
+          UPSTREAM_BRANCH="${{ inputs.upstream_branch }}"
+          UPSTREAM_SHA=$(git rev-parse upstream/${UPSTREAM_BRANCH})
+          echo "🔀 Rebasing onto upstream/${UPSTREAM_BRANCH} (${UPSTREAM_SHA})..."
+
+          if git rebase "upstream/${UPSTREAM_BRANCH}"; then
+            echo "success=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Rebase succeeded!"
+          else
+            echo "success=false" >> "$GITHUB_OUTPUT"
+            echo "❌ Rebase failed due to conflicts."
+          fi
+
+      - name: Report conflicts (on failure)
+        if: steps.rebase.outputs.success == 'false'
+        run: |
+          echo "============================================"
+          echo "❌ REBASE CONFLICT REPORT"
+          echo "============================================"
+          echo ""
+          echo "📁 Conflicting files:"
+          git diff --name-only --diff-filter=U
+          echo ""
+          echo "============================================"
+          echo "📋 Conflict details:"
+          echo "============================================"
+          git diff
+          echo ""
+          echo "============================================"
+          echo "Aborting rebase..."
+          git rebase --abort
+          exit 1
+
+      - name: Push merge-upstream branch
+        if: steps.rebase.outputs.success == 'true'
+        run: |
+          echo "⬆️ Pushing merge-upstream branch to origin..."
+          git push --force-with-lease origin merge-upstream
+          echo "✅ Successfully pushed merge-upstream branch."
+          echo ""
+          echo "📊 Summary:"
+          echo "  - Branch: merge-upstream"
+          echo "  - Based on: apk-integration"
+          echo "  - Rebased onto: upstream/${{ inputs.upstream_branch }}"
+          echo "  - Latest commit:"
+          git log --oneline -1
